@@ -336,29 +336,227 @@
 
   .map-container { position: relative; width: 100%; height: 480px; background: var(--dark-2); }
 
-  .map-container iframe { width: 100%; height: 100%; border: none; display: block; }
+  #yandexMap {
+    width: 100%;
+    height: 100%;
+  }
 
+  /* Скрываем все стандартные элементы управления Яндекс.Карты */
+  #yandexMap [class*="controls__control"] {
+    display: none !important;
+  }
+
+  /* ====================================================================
+     ЕДИНЫЙ СТИЛЬ ДЛЯ ВСЕХ ЭЛЕМЕНТОВ УПРАВЛЕНИЯ КАРТЫ
+     Кнопки, ползунок масштаба и панель с адресом — один дизайн
+     ==================================================================== */
+  .map-ctrl,
   .map-overlay-badge {
-    position: absolute; bottom: 20px; left: 20px;
-    background: rgba(13, 17, 23, 0.92); backdrop-filter: blur(10px);
-    border: 1px solid var(--border); border-radius: 14px;
-    padding: 14px 20px; display: flex; align-items: center; gap: 12px;
-    z-index: 10; pointer-events: none;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    background: rgba(13, 17, 23, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    color: var(--text);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    transition: all 0.2s ease;
+    user-select: none;
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  /* Единый hover-эффект */
+  .map-ctrl:hover,
+  .map-overlay-badge:hover {
+    background: var(--primary);
+    color: #000;
+    border-color: var(--primary);
+    box-shadow: 0 6px 20px rgba(0, 210, 106, 0.4);
+  }
+
+  /* Единый active/focus эффект — контрастный и читаемый */
+  .map-ctrl:focus-visible,
+  .map-ctrl:focus,
+  .map-ctrl:active,
+  .map-overlay-badge:focus-visible,
+  .map-overlay-badge:focus,
+  .map-overlay-badge:active {
+    background: var(--primary);
+    color: #000;
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 210, 106, 0.35), 0 6px 20px rgba(0, 210, 106, 0.4);
+  }
+
+  /* Принудительно чёрный цвет для текста и иконок во всех состояниях */
+  .map-ctrl:hover svg,
+  .map-ctrl:focus svg,
+  .map-ctrl:active svg,
+  .map-overlay-badge:hover svg,
+  .map-overlay-badge:focus svg,
+  .map-overlay-badge:active svg {
+    stroke: #000;
+    color: #000;
+  }
+
+  /* Для текста внутри панели — чёрный при hover/focus/active */
+  .map-overlay-badge:hover span,
+  .map-overlay-badge:focus span,
+  .map-overlay-badge:active span,
+  .map-overlay-badge:hover small,
+  .map-overlay-badge:focus small,
+  .map-overlay-badge:active small {
+    color: #000;
+  }
+
+  /* Кнопки (геолокация, fullscreen) */
+  .map-ctrl {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-size: 18px;
+  }
+
+  .map-ctrl svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: stroke 0.2s ease;
+  }
+
+  /* Ползунок масштабирования */
+  .map-zoom {
+    width: 40px;
+    height: auto;
+    flex-direction: column;
+    padding: 4px 0;
+    gap: 0;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .map-zoom-btn {
+    width: 40px;
+    height: 36px;
+    background: transparent;
+    border: none;
+    color: inherit;
+    font-size: 20px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    font-family: inherit;
+    line-height: 1;
+    padding: 0;
+    border-radius: 6px;
+  }
+
+  .map-zoom-btn:hover,
+  .map-zoom-btn:focus,
+  .map-zoom-btn:active {
+    background: rgba(0, 0, 0, 0.08);
+    color: #000;
+    outline: none;
+  }
+
+  .map-zoom-divider {
+    width: 24px;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.3;
+    margin: 0 auto;
+    transition: background 0.2s ease;
+  }
+
+  /* Блок управления картой */
+  .map-controls {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 20;
+  }
+
+  /* Панель с адресом — правый нижний угол */
+  .map-overlay-badge {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    border-radius: 14px;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 10;
+    text-align: left;
+    line-height: 1.4;
   }
 
   .map-overlay-badge .pulse-dot {
-    width: 10px; height: 10px; background: var(--primary);
-    border-radius: 50%; position: relative; flex-shrink: 0;
+    width: 10px;
+    height: 10px;
+    background: var(--primary);
+    border-radius: 50%;
+    position: relative;
+    flex-shrink: 0;
+    transition: background 0.2s ease;
   }
+
+  .map-overlay-badge:hover .pulse-dot,
+  .map-overlay-badge:focus .pulse-dot,
+  .map-overlay-badge:active .pulse-dot {
+    background: #000;
+  }
+
   .map-overlay-badge .pulse-dot::after {
-    content: ''; position: absolute; inset: -4px; border-radius: 50%;
-    background: var(--primary); opacity: 0.4;
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: inherit;
+    opacity: 0.4;
     animation: pulse-ring 1.5s infinite;
   }
-  @keyframes pulse-ring { 0% { transform: scale(1); opacity: 0.4; } 100% { transform: scale(2.2); opacity: 0; } }
-  .map-overlay-badge span { font-size: 14px; font-weight: 600; }
-  .map-overlay-badge small { display: block; color: var(--muted); font-size: 12px; font-weight: 400; }
+
+  @keyframes pulse-ring {
+    0% { transform: scale(1); opacity: 0.4; }
+    100% { transform: scale(2.2); opacity: 0; }
+  }
+
+  .map-overlay-badge span {
+    font-size: 14px;
+    font-weight: 700;
+    display: block;
+    color: var(--text);
+    transition: color 0.2s ease;
+  }
+
+  .map-overlay-badge small {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+
+  /* Анимация нажатия для панели */
+  .map-overlay-badge.is-pressed {
+    transform: scale(0.96);
+  }
 
   .cta {
     background: linear-gradient(135deg, var(--card), var(--dark-2));
@@ -426,7 +624,9 @@
     .cta { padding: 40px 24px; }
     .hero-buttons .btn { width: 100%; justify-content: center; }
     .map-container { height: 320px; }
-    .map-overlay-badge { bottom: 12px; left: 12px; padding: 10px 14px; }
+    .map-overlay-badge { bottom: 12px; right: 12px; padding: 10px 14px; }
+    .map-controls { top: 12px; right: 12px; gap: 6px; }
+    .map-ctrl, .map-zoom-btn { width: 36px; height: 36px; }
     .scroll-top { bottom: 16px; right: 16px; width: 44px; height: 44px; }
     .reviews-score-num { font-size: 38px; }
   }
@@ -567,7 +767,6 @@
 
     <div class="reviews-grid" id="reviewsGrid">
 
-      <!-- 1. Дмитрий -->
       <div class="review-card">
         <div class="review-header">
           <div class="review-avatar" style="background: linear-gradient(135deg, #7c5cff, #5b3fd9);">Д</div>
@@ -586,7 +785,6 @@
         <div class="review-text">Восстановил аккумулятор от самоката Midway, цена оказалась очень хорошей, все отлично</div>
       </div>
 
-      <!-- 2. Ильдар Исхаков -->
       <div class="review-card">
         <div class="review-header">
           <div class="review-avatar" style="background: linear-gradient(135deg, #00b8d4, #0097a7);">И</div>
@@ -605,7 +803,6 @@
         <div class="review-text">Рекомендую</div>
       </div>
 
-      <!-- 3. Наиль -->
       <div class="review-card">
         <div class="review-header">
           <div class="review-avatar" style="background: linear-gradient(135deg, #00d26a, #00a854);">Н</div>
@@ -624,7 +821,6 @@
         <div class="review-text">Все как обговаривали! Спасибо за работу?</div>
       </div>
 
-      <!-- 4. Влад Гар -->
       <div class="review-card">
         <div class="review-header">
           <div class="review-avatar" style="background: linear-gradient(135deg, #ff6b6b, #c92a2a);">В</div>
@@ -643,7 +839,6 @@
         <div class="review-text">Спасибо, все сделано быстро и качественно, была замена АКБ на пылесосе.</div>
       </div>
 
-      <!-- 5. Антон -->
       <div class="review-card">
         <div class="review-header">
           <div class="review-avatar" style="background: linear-gradient(135deg, #51cf66, #2f9e44);">А</div>
@@ -662,7 +857,6 @@
         <div class="review-text">Всё быстро и отлично 👍 рекомендую</div>
       </div>
 
-      <!-- 6. Детские электромобили -->
       <div class="review-card">
         <div class="review-header">
           <div class="review-avatar" style="background: linear-gradient(135deg, #f783ac, #c2255c);">Д</div>
@@ -681,7 +875,6 @@
         <div class="review-text">Починили детский электромобиль за что премного благодарен, и очень недорого, теперь знаю к кому ехать в случае чего по разным вопросам;)</div>
       </div>
 
-      <!-- 7. Марсель Зайнуллин -->
       <div class="review-card">
         <div class="review-header">
           <div class="review-avatar" style="background: linear-gradient(135deg, #4dabf7, #1971c2);">М</div>
@@ -700,7 +893,6 @@
         <div class="review-text">Специалист в своем деле. Провел диагностику аккумуляторной батареи от самоката. Есть запчасти в наличии.</div>
       </div>
 
-      <!-- 8. Айбулат -->
       <div class="review-card">
         <div class="review-header">
           <div class="review-avatar" style="background: linear-gradient(135deg, #a78bfa, #7c3aed);">А</div>
@@ -719,7 +911,6 @@
         <div class="review-text">Все отлично ! Произвел ремонт АКБ шуруповерта . Всем рекомендую !</div>
       </div>
 
-      <!-- 9. Линар -->
       <div class="review-card">
         <div class="review-header">
           <div class="review-avatar" style="background: linear-gradient(135deg, #4dabf7, #0b5ed7);">Л</div>
@@ -738,7 +929,6 @@
         <div class="review-text">Всё, отлично, нужно было сделать срочно одну пайку в выходной день, Данир выручил!</div>
       </div>
 
-      <!-- 10. Пользователь -->
       <div class="review-card">
         <div class="review-header">
           <div class="review-avatar" style="background: linear-gradient(135deg, #a9e34b, #66a80f);">П</div>
@@ -757,7 +947,6 @@
         <div class="review-text">Надо было запчасти, для переделки аккумулятора. Все оказалось в наличии. Очень обрадовало, не пришлось ждать несколько недель. Продавца рекомендую.</div>
       </div>
 
-      <!-- 11. Артур -->
       <div class="review-card">
         <div class="review-header">
           <div class="review-avatar" style="background: linear-gradient(135deg, #22b8cf, #0c8599);">А</div>
@@ -776,7 +965,6 @@
         <div class="review-text">Работа была выполнена качественно и быстро, аккумуляторы тянут , работой доволен, рекомендую! спасибо Даниру!</div>
       </div>
 
-      <!-- 12. Юлиана -->
       <div class="review-card">
         <div class="review-header">
           <div class="review-avatar" style="background: linear-gradient(135deg, #e599f7, #9c36b5);">Ю</div>
@@ -795,7 +983,6 @@
         <div class="review-text">Рекомендую данного мастера, очень грамотный специалист , пылесос Dyson V12S отремонтировал , сделал прошивку мотора, поменял уплотнители 👍 теперь как новенький . Благодарю за работу . Цены низкие , адекватные , всегда на связи 👍</div>
       </div>
 
-      <!-- 13. Рустам -->
       <div class="review-card">
         <div class="review-header">
           <div class="review-avatar" style="background: linear-gradient(135deg, #74c0fc, #1971c2);">Р</div>
@@ -814,7 +1001,6 @@
         <div class="review-text">Все отлично! Быстро, в день обращения аккумулятор от шуруповерта Зубр восстановлен (не принимал заряд) все работает замечаний нет. Спасибо!</div>
       </div>
 
-      <!-- 14. Гузель -->
       <div class="review-card">
         <div class="review-header">
           <div class="review-avatar" style="background: linear-gradient(135deg, #ffa94d, #e8590c);">Г</div>
@@ -855,6 +1041,7 @@
   </div>
 </section>
 
+<!-- MAP SECTION — ЯНДЕКС.КАРТА через JS API -->
 <section class="map-section" id="map">
   <div class="container">
     <div class="section-title">
@@ -871,28 +1058,51 @@
             <p>Республика Башкортостан · ежедневно с 9:00 до 20:00</p>
           </div>
         </div>
-        <a href="https://www.google.com/maps/dir/?api=1&destination=Стерлитамак+улица+Николаева+24"
+        <a href="https://yandex.ru/maps/?rtext=~53.645600%2C55.931900&rtt=auto"
            target="_blank" rel="noopener" class="map-route-btn">
           🧭 Построить маршрут
         </a>
       </div>
 
-      <div class="map-container">
-        <iframe
-          src="https://maps.google.com/maps?q=Стерлитамак%2C%20улица%20Николаева%2C%2024&t=m&z=16&output=embed&iwloc=near"
-          allowfullscreen
-          loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade"
-          title="Карта — Стерлитамак, ул. Николаева, 24">
-        </iframe>
+      <div class="map-container" id="mapContainer">
+        <div id="yandexMap"></div>
 
-        <div class="map-overlay-badge">
+        <!-- Единый блок управления картой (справа) -->
+        <div class="map-controls">
+
+          <!-- 1. Кнопка определения местоположения -->
+          <button class="map-ctrl" id="geolocationBtn" aria-label="Определить моё местоположение" title="Определить моё местоположение">
+            <svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M12 2v3m0 14v3M2 12h3m14 0h3"/>
+              <circle cx="12" cy="12" r="8"/>
+            </svg>
+          </button>
+
+          <!-- 2. Ползунок масштабирования -->
+          <div class="map-ctrl map-zoom" role="group" aria-label="Управление масштабом">
+            <button class="map-zoom-btn" id="zoomInBtn" aria-label="Приблизить" title="Приблизить">+</button>
+            <div class="map-zoom-divider"></div>
+            <button class="map-zoom-btn" id="zoomOutBtn" aria-label="Отдалить" title="Отдалить">−</button>
+          </div>
+
+          <!-- 3. Кнопка на весь экран -->
+          <button class="map-ctrl" id="fullscreenBtn" aria-label="На весь экран" title="На весь экран">
+            <svg viewBox="0 0 24 24">
+              <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+            </svg>
+          </button>
+
+        </div>
+
+        <!-- Кликабельная панель — фокусирует карту на адресе -->
+        <button class="map-overlay-badge" id="focusBadge" type="button" aria-label="Показать адрес на карте" title="Показать адрес на карте">
           <div class="pulse-dot"></div>
           <div>
             <span>Ремонт АКБ</span>
             <small>ул. Николаева, 24 · сейчас открыто</small>
           </div>
-        </div>
+        </button>
       </div>
 
     </div>
@@ -923,7 +1133,204 @@
 
 <button class="scroll-top" id="scrollTop" aria-label="Наверх">↑</button>
 
+<!-- Яндекс.Карты JS API -->
+<script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=" type="text/javascript"></script>
+
 <script>
+  let yandexMapInstance = null;
+  let mainPlacemark = null;
+  const ADDRESS_COORDS = [53.645600, 55.931900]; // ул. Николаева, 24
+
+  // === 0. ИНИЦИАЛИЗАЦИЯ ЯНДЕКС.КАРТЫ ===
+  function initYandexMap() {
+    if (typeof ymaps === 'undefined') {
+      console.warn('Яндекс.Карты не загрузились');
+      return;
+    }
+    ymaps.ready(function () {
+      const mapContainer = document.getElementById('yandexMap');
+      if (!mapContainer) return;
+
+      yandexMapInstance = new ymaps.Map('yandexMap', {
+        center: ADDRESS_COORDS,
+        zoom: 17,
+        controls: []
+      }, {
+        suppressMapOpenBlock: true
+      });
+
+      // Метка на карте
+      mainPlacemark = new ymaps.Placemark(ADDRESS_COORDS, {
+        balloonContentHeader: '<strong>Ремонт АКБ</strong>',
+        balloonContentBody: 'г. Стерлитамак, ул. Николаева, 24<br>Ежедневно с 9:00 до 20:00<br><a href="tel:89677329060">8 967 732-90-60</a>',
+        hintContent: 'Ремонт АКБ — ул. Николаева, 24'
+      }, {
+        preset: 'islands#greenDotIconWithCaption',
+        iconCaption: 'Ремонт АКБ'
+      });
+
+      yandexMapInstance.geoObjects.add(mainPlacemark);
+      yandexMapInstance.behaviors.disable('scrollZoom');
+
+      yandexMapInstance.events.add('click', () => {
+        yandexMapInstance.behaviors.enable('scrollZoom');
+      });
+
+      initCustomControls();
+      initFocusBadge();
+    });
+  }
+
+  if (typeof ymaps !== 'undefined') {
+    ymaps.ready(initYandexMap);
+  } else {
+    window.addEventListener('load', initYandexMap);
+  }
+
+  // === 0.1 КЛИК ПО ПАНЕЛИ — ФОКУС НА АДРЕСЕ ===
+  function initFocusBadge() {
+    const badge = document.getElementById('focusBadge');
+    if (!badge) return;
+
+    badge.addEventListener('click', () => {
+      if (!yandexMapInstance || !mainPlacemark) return;
+
+      // Анимация нажатия
+      badge.classList.add('is-pressed');
+      setTimeout(() => badge.classList.remove('is-pressed'), 150);
+
+      // Плавно перемещаем карту к адресу и увеличиваем масштаб
+      yandexMapInstance.setCenter(ADDRESS_COORDS, 18, {
+        duration: 600,
+        timingFunction: 'ease-in-out'
+      });
+
+      // Открываем балун с информацией
+      setTimeout(() => {
+        mainPlacemark.balloon.open();
+      }, 650);
+    });
+  }
+
+  // === 0.2 КАСТОМНЫЕ КНОПКИ УПРАВЛЕНИЯ ===
+  function initCustomControls() {
+    const mapContainer = document.getElementById('mapContainer');
+
+    // --- Кнопка геолокации ---
+    const geolocationBtn = document.getElementById('geolocationBtn');
+    if (geolocationBtn) {
+      geolocationBtn.addEventListener('click', () => {
+        if (!yandexMapInstance) return;
+
+        if (!navigator.geolocation) {
+          alert('Геолокация не поддерживается вашим браузером');
+          return;
+        }
+
+        geolocationBtn.style.opacity = '0.6';
+        geolocationBtn.disabled = true;
+
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const userCoords = [position.coords.latitude, position.coords.longitude];
+
+            if (window.userPlacemark) {
+              yandexMapInstance.geoObjects.remove(window.userPlacemark);
+            }
+
+            window.userPlacemark = new ymaps.Placemark(userCoords, {
+              hintContent: 'Вы здесь',
+              balloonContent: 'Ваше текущее местоположение'
+            }, {
+              preset: 'islands#blueCircleDotIcon'
+            });
+
+            yandexMapInstance.geoObjects.add(window.userPlacemark);
+            yandexMapInstance.setCenter(userCoords, 15, { duration: 500 });
+
+            geolocationBtn.style.opacity = '1';
+            geolocationBtn.disabled = false;
+          },
+          (error) => {
+            let message = 'Не удалось определить местоположение';
+            if (error.code === 1) message = 'Доступ к геолокации запрещён. Разрешите доступ в настройках браузера.';
+            if (error.code === 2) message = 'Информация о местоположении недоступна.';
+            if (error.code === 3) message = 'Превышено время ожидания. Попробуйте ещё раз.';
+            alert(message);
+
+            geolocationBtn.style.opacity = '1';
+            geolocationBtn.disabled = false;
+          },
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+      });
+    }
+
+    // --- Ползунок масштабирования ---
+    const zoomInBtn = document.getElementById('zoomInBtn');
+    const zoomOutBtn = document.getElementById('zoomOutBtn');
+
+    if (zoomInBtn) {
+      zoomInBtn.addEventListener('click', () => {
+        if (!yandexMapInstance) return;
+        const currentZoom = yandexMapInstance.getZoom();
+        yandexMapInstance.setZoom(currentZoom + 1, { duration: 200 });
+      });
+    }
+
+    if (zoomOutBtn) {
+      zoomOutBtn.addEventListener('click', () => {
+        if (!yandexMapInstance) return;
+        const currentZoom = yandexMapInstance.getZoom();
+        yandexMapInstance.setZoom(currentZoom - 1, { duration: 200 });
+      });
+    }
+
+    // --- Кнопка "На весь экран" ---
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    if (fullscreenBtn && mapContainer) {
+      const expandIcon = `
+        <svg viewBox="0 0 24 24">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+        </svg>`;
+      const collapseIcon = `
+        <svg viewBox="0 0 24 24">
+          <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
+        </svg>`;
+
+      fullscreenBtn.addEventListener('click', () => {
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+          if (mapContainer.requestFullscreen) {
+            mapContainer.requestFullscreen();
+          } else if (mapContainer.webkitRequestFullscreen) {
+            mapContainer.webkitRequestFullscreen();
+          } else if (mapContainer.msRequestFullscreen) {
+            mapContainer.msRequestFullscreen();
+          }
+        } else {
+          if (document.exitFullscreen) {
+            document.exitFullscreen();
+          } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+          } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+          }
+        }
+      });
+
+      const handleFullscreenChange = () => {
+        const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
+        fullscreenBtn.innerHTML = isFullscreen ? collapseIcon : expandIcon;
+        if (yandexMapInstance) {
+          setTimeout(() => yandexMapInstance.container.fitToViewport(), 100);
+        }
+      };
+
+      document.addEventListener('fullscreenchange', handleFullscreenChange);
+      document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    }
+  }
+
   // === 1. ПЛАВНАЯ ПРОКРУТКА К СЕКЦИЯМ ===
   document.querySelectorAll('a[href^="#"]').forEach(link => {
     link.addEventListener('click', function(e) {
@@ -990,7 +1397,6 @@
   });
 
   // === 4. ПОКАЗАТЬ ВСЕ ОТЗЫВЫ ===
-  // Изначально показываем 6 отзывов, остальные скрыты
   const INITIAL_REVIEWS_COUNT = 6;
   let reviewsExpanded = false;
 
